@@ -1,6 +1,8 @@
 import argparse
 import pandas as pd
 from Preprocessing import read_file
+from Preprocessing import dim_reduce
+
 
 
 def main():
@@ -14,7 +16,9 @@ def main():
     # Aggregate dfs into one giant df
     df = pd.concat(frames)
     print(df.shape)
-    df.to_csv("temp.csv", index = False)
+    df
+    #df.to_csv("temp.csv", index = False)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
