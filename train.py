@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
 import pandas as pd
-from Preprocessing import read_file
 from Preprocessing import dim_reduce
 from sklearn.model_selection import KFold
 from sklearn.neural_network import MLPClassifier
@@ -9,7 +8,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 
 
-def main():
+def train():
     # directory = ["Pro_41", "Pro_43", "Pro_98_80", "Pro_98_81W", "Pro_112_Clem_12-11-17", "Pro_112_Daisy_1-4-18", "Pro_112_Daisy_12-13-17"]
     # blocks = ["41N", "92E", "80", "81W", "64E", "64E", "64E"]
     # frames = []
@@ -22,7 +21,7 @@ def main():
     # df = pd.concat(frames, sort=False)
 
     #df.to_csv("temp2.csv", index = False)
-    df = pd.read_csv("./temp2.csv")
+    df = pd.read_csv("../temp2.csv")
 
     # Dimensionality Reduction based on correlation analysis
     df = dim_reduce.reduce(df)
@@ -67,4 +66,4 @@ def main():
 
 if __name__ == "__main__":
     # parser = argparse.ArgumentParser()
-    main()
+    train()
