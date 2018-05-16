@@ -6,9 +6,9 @@ from pathlib import Path
 def read(directory, block):
     pathlist = Path(directory).glob('*')
     frames = []
-
+    print("=====Start reading files in " + directory + " ========")
     for path in pathlist :
-        print(str(path))
+        # print(str(path))
         # Skip batch info rows
         if str(path).endswith('csv') :
             dataFrame = pd.read_csv(str(path), skiprows = 5)
@@ -27,8 +27,8 @@ def read(directory, block):
 
         # Append to the list of DataFrame
         frames.append(dataFrame)
-
-    return pd.concat(frames)
+    print("=====Finish reading files=======")
+    return pd.concat(frames, sort=False)
 
 
 

@@ -1,10 +1,11 @@
 import pandas as pd
 
 def reduce(data_frame):
-    df_feature = data_frame.rename(index=str,columns={"IQS 1 avg" : "brix", "IQS 2 avg" : "granulation",
-                                                      "IQS 3 avg" : "seed_counts", "IQS 4 avg" : "frost_damage"})
+    print("===== Start reducing features ======")
+    data_frame = data_frame.rename(index=str, columns={"IQS 1 avg": "brix", "IQS 2 avg": "granulation",
+                                       "IQS 3 avg": "seed_counts", "IQS 4 avg": "frost_damage"})
 
-    df_feature = df_feature[['2nd Color Variation (Dark Yellow +)', 'Elongation', 'Fruit', 'brix',
+    df_feature = data_frame[['2nd Color Variation (Dark Yellow +)', 'Elongation', 'Fruit', 'brix',
                              'granulation', 'Orange', 'Overall Roundness', 'Calyx size', 'seed_counts',
                              'Stem Size',  # Fill with mean
 
@@ -19,7 +20,7 @@ def reduce(data_frame):
                              'Texture', 'UpWeight', 'VisionGrade', 'Volume', 'Weight'  # No Filling
                              ]]
 
-    df_target = df_feature[['block_Num']]
+    df_target = data_frame[['block_Num']]
 
     # Fill with mean
     df_feature = df_feature.fillna(df_feature.mean()['2nd Color Variation (Dark Yellow +)':'Stem Size'])
@@ -40,7 +41,12 @@ def reduce(data_frame):
             correlation_matrix = correlation_matrix.drop(col)
             correlation_matrix = correlation_matrix.drop(col, axis=1)
 
+
     df_feature_filtered = df_feature[correlation_matrix.columns]
+
+    # Reuse the index of df_feature_filtered
     df_feature_filtered = pd.concat([df_feature_filtered, df_target], axis=1)
+
+    print("===== Finish reducing features ======")
 
     return df_feature_filtered
