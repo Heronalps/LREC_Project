@@ -5,8 +5,9 @@ def reduce(data_frame):
     data_frame = data_frame.rename(index=str, columns={"IQS 1 avg": "brix", "IQS 2 avg": "granulation",
                                        "IQS 3 avg": "seed_counts", "IQS 4 avg": "frost_damage"})
 
+
     df_feature = data_frame[['2nd Color Variation (Dark Yellow +)', 'Elongation', 'Fruit', 'brix',
-                             'granulation', 'Orange', 'Overall Roundness', 'Calyx size', 'seed_counts',
+                             'granulation', 'Orange', 'Calyx size', 'seed_counts', 'Overall Roundness',
                              'Stem Size',  # Fill with mean
 
                              'Creases', 'Dark Orange', 'frost_damage', 'Lemon (Dark Yellow +)',

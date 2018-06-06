@@ -1,38 +1,43 @@
-import argparse
 import numpy as np
-from Preprocessing.reducer import *
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from Preprocessing.pca_reducer import *
 from sklearn.model_selection import KFold
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 
-
-
 def train():
-    # directory = ["Pro_41", "Pro_43", "Pro_98_80", "Pro_98_81W", "Pro_112_Clem_12-11-17", "Pro_112_Daisy_1-4-18", "Pro_112_Daisy_12-13-17"]
-    # blocks = ["41N", "92E", "80", "81W", "64E", "64E", "64E"]
-    # frames = []
-    # for i in range(len(directory)) :
-    #     print(directory[i])
-    #     temp_df = read_file.read("./dataset/" + directory[i], blocks[i])
-    #     frames.append(temp_df)
-    #
-    # # Aggregate dfs into one giant df
-    # df = pd.concat(frames, sort=False)
-
-    #df.to_csv("temp2.csv", index = False)
+    print("===== Loading data ======")
     df = pd.read_csv("./temp2.csv")
+    df_target = df[['block_Num']]
+    df = pca_reduce(df)
+    pca = PCA(n_components=3, svd_solver='auto')
+    df_feature = df.iloc[:, 0:-1]
 
-    # Dimensionality Reduction based on correlation analysis
-    df = reduce(df)
+    pca.fit(df_feature.values)
+    print("PCA Explained Variance Ratio : ", pca.explained_variance_ratio_)
+    print("PCA Singular Values : ", pca.singular_values_)
+    first_pc = pca.components_[0]
+    second_pc = pca.components_[1]
+    third_pc = pca.components_[2]
+    print('====First Principal Component==== ')
+    print(first_pc)
 
+    transform_df = pd.DataFrame(pca.transform(df_feature), columns=['pc_1', 'pc_2', 'pc_3'])
+    transform_df = pd.concat([transform_df, df_target], axis=1)
+    print(transform_df.head)
+    # print(type(transform_df))
+    # print(transform_df.index)
 
     # Scamble and subset data frame into train + validation(80%) and test(10%)
-    df = df.sample(frac=1).reset_index(drop=True)
-    split_ratio = 0.3
-    print('Train and Test Split Ratio : ', split_ratio)
-    df_train = df[ : int(len(df) * split_ratio)]
-    df_test = df[int(len(df) * split_ratio) : ]
+    transform_df = transform_df.sample(frac=1).reset_index(drop=True)
+    split_ratio = 0.8
+    df_train = transform_df[: int(len(transform_df) * split_ratio)]
+    df_test = transform_df[int(len(transform_df) * split_ratio):]
+
+    print("===== Feeding first 3 Principal Components to Neural Network =====")
 
     kf = KFold(n_splits=10)
     solver = MLPClassifier(activation='relu',
@@ -65,6 +70,7 @@ def train():
     print("Prediction dataset Distribution")
     print(np.asarray((unique, count)).T)
 
+
+
 if __name__ == "__main__":
-    # parser = argparse.ArgumentParser()
     train()
