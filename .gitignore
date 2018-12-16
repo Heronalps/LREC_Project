@@ -2,4 +2,6 @@
 .ipynb_checkpoints/
 .idea/
 *.csv
+*.xlsx
+*.zip
 /references/
