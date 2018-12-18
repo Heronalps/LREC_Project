@@ -1,35 +1,33 @@
 import argparse
 import numpy as np
 from Preprocessing.reducer import *
+from Preprocessing.read_file import read
 from sklearn.model_selection import KFold
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 
-
-
 def train():
     directory = ["Pro_41", "Pro_43", "Pro_98_80", "Pro_98_81W", "Pro_112_Clem_12-11-17", "Pro_112_Daisy_1-4-18", "Pro_112_Daisy_12-13-17"]
     blocks = ["41N", "92E", "80", "81W", "64E", "64E", "64E"]
     frames = []
-    for i in range(len(directory)) :
+    for i in range(len(directory)):
         print(directory[i])
-        temp_df = read_file.read("./dataset/" + directory[i], blocks[i])
+        temp_df = read("./dataset/2017/" + directory[i], blocks[i])
         frames.append(temp_df)
     
-    # Aggregate dfs into one giant df
-    df = pd.concat(frames, sort=False)
+    # # Aggregate dfs into one giant df
+    # df = pd.concat(frames, sort=False)
 
-    # #df.to_csv("temp2.csv", index = False)
-    # df = pd.read_csv("./temp2.csv")
+    #df.to_csv("temp2.csv", index = False)
+    df = pd.read_csv("./temp2.csv")
 
     # Dimensionality Reduction based on correlation analysis
     df = reduce(df)
 
-
     # Scamble and subset data frame into train + validation(80%) and test(10%)
     df = df.sample(frac=1).reset_index(drop=True)
-    split_ratio = 0.3
+    split_ratio = 0.8
     print('Train and Test Split Ratio : ', split_ratio)
     df_train = df[ : int(len(df) * split_ratio)]
     df_test = df[int(len(df) * split_ratio) : ]
@@ -49,6 +47,9 @@ def train():
     target_test = df_test.iloc[:, -1].values
 
     # Train NN with train dataset
+    # The classification is random and could be skewed, because the training set is sampled.
+    # Generally, it is down to 0.996 accuracy and ~1.0 f1-score for 5 fields.
+    
     for train_indices, test_indices in kf.split(feature_train, target_train):
         solver.fit(feature_train[train_indices], target_train[train_indices])
         print(solver.score(feature_train[test_indices], target_train[test_indices]))

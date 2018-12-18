@@ -39,6 +39,8 @@ def reduce(data_frame):
     for col in correlation_matrix.columns:
         if correlation_matrix[col].between(0.8, 1.0, inclusive=False).any() or \
                 correlation_matrix[col].between(-1.0, -0.8).any():
+                
+            # Drop row and column in the correlation matrix
             correlation_matrix = correlation_matrix.drop(col)
             correlation_matrix = correlation_matrix.drop(col, axis=1)
 
