@@ -23,7 +23,7 @@ def read(directory, block):
         dataFrame = dataFrame.loc[:, ~dataFrame.columns.duplicated()]
 
         # Assign Block # to DataFrame
-        dataFrame = dataFrame.assign(block_Num = block)
+        dataFrame = dataFrame.assign(block_Num = str(block))
 
         # Append to the list of DataFrame
         frames.append(dataFrame)

@@ -1,8 +1,9 @@
 .DS_Store
 .ipynb_checkpoints/
 .idea/
+/references/
+__pycache__/
 *.csv
 *.xlsx
 *.zip
-/references/
 *.pyc

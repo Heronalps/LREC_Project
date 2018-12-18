@@ -2,28 +2,85 @@ import argparse
 import numpy as np
 from Preprocessing.reducer import *
 from Preprocessing.read_file import read
+from Preprocessing.preprocess import makefile
 from sklearn.model_selection import KFold
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 
-def train():
-    directory = ["Pro_41", "Pro_43", "Pro_98_80", "Pro_98_81W", "Pro_112_Clem_12-11-17", "Pro_112_Daisy_1-4-18", "Pro_112_Daisy_12-13-17"]
-    blocks = ["41N", "92E", "80", "81W", "64E", "64E", "64E"]
-    frames = []
-    for i in range(len(directory)):
-        print(directory[i])
-        temp_df = read("./dataset/2017/" + directory[i], blocks[i])
-        frames.append(temp_df)
-    
-    # # Aggregate dfs into one giant df
-    # df = pd.concat(frames, sort=False)
+FILENAME = "data_2018"
+PATH = "./dataset/2018/"
 
-    #df.to_csv("temp2.csv", index = False)
-    df = pd.read_csv("./temp2.csv")
+directory_2017 = {
+    "Pro_41" : "41N",
+    "Pro_43" : "92E",
+    "Pro_98_80" : "80",
+    "Pro_98_81W" : "81W",
+    "Pro_112_Clem_12-11-17" : "64E",
+    "Pro_112_Daisy_1-4-18" : "64E",
+    "Pro_112_Daisy_12-13-17" : "64E"
+}
+
+directory_2018 = {
+    # "Pro_143_field_81C_8-19-18" : "81C",
+    "Pro_98_field_80_9-18-18" : "80"
+}
+
+def test():
+    # makefile(PATH, directory_2018, FILENAME)
+    
+    df_2017 = pd.read_csv("./data_2017.csv")
+    df_2018 = pd.read_csv("./data_2018.csv")
 
     # Dimensionality Reduction based on correlation analysis
-    df = reduce(df)
+    df_2017 = reduce(df_2017, 2017)
+    df_2018 = reduce(df_2018, 2018)
+
+    # Since the columns in 2017 dataset are way more than 2018.
+    # Filter them out in the 2017 training dataset.
+    df_2017 = df_2017.filter(items = df_2018.columns)
+    
+    # Cast block num from int64 to str object
+    df_2018.loc[:, 'block_Num'] = df_2018.loc[:, 'block_Num'].astype(str)
+
+    kf = KFold(n_splits=10)
+    solver = MLPClassifier(activation='relu',
+                           solver='adam',
+                           alpha=1e-5,
+                           hidden_layer_sizes=(100, 2),
+                           random_state=1,
+                           verbose=True)
+
+    # convert dataframe to ndarray, since kf.split returns nparray as index
+    feature_train = df_2017.iloc[:, 0: -1].values
+    target_train = df_2017.iloc[:, -1].values
+    feature_test = df_2018.iloc[:, 0: -1].values
+    target_test = df_2018.iloc[:, -1].values
+
+    for train_indices, test_indices in kf.split(feature_train, target_train):
+        solver.fit(feature_train[train_indices], target_train[train_indices])
+        print(solver.score(feature_train[test_indices], target_train[test_indices]))
+
+    y_pred = solver.predict(feature_test)
+    print("Accuracy Score : " + str(accuracy_score(y_pred, target_test)))
+    print(classification_report(target_test, y_pred))
+
+    unique, count = np.unique(target_test, return_counts=True)
+    print("Test dataset Distribution")
+    print(np.asarray((unique, count)).T)
+
+    unique, count = np.unique(y_pred, return_counts=True)
+    print("Prediction dataset Distribution")
+    print(np.asarray((unique, count)).T)
+
+
+def train():
+    # makefile(PATH, directory_2018, FILENAME)
+    
+    df_2017 = pd.read_csv("./data_2017.csv")
+
+    # Dimensionality Reduction based on correlation analysis
+    df = reduce(df_2017, 2017)
 
     # Scamble and subset data frame into train + validation(80%) and test(10%)
     df = df.sample(frac=1).reset_index(drop=True)
@@ -68,4 +125,6 @@ def train():
 
 if __name__ == "__main__":
     # parser = argparse.ArgumentParser()
-    train()
+    # train()
+    test()
+    # makefile(PATH, directory_2018, FILENAME)
