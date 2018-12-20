@@ -26,6 +26,8 @@ directory_2018 = {
     "Pro_98_field_80_9-18-18" : "80"
 }
 
+# This script train the NN model on 2017 data and test on 2018 data
+
 def test():
     # makefile(PATH, directory_2018, FILENAME)
     
@@ -78,9 +80,12 @@ def train():
     # makefile(PATH, directory_2018, FILENAME)
     
     df_2017 = pd.read_csv("./data_2017.csv")
+    df_2018 = pd.read_csv("./data_2018.csv")
 
     # Dimensionality Reduction based on correlation analysis
     df = reduce(df_2017, 2017)
+    df_2018 = reduce(df_2018, 2018)
+    df = df.filter(items = df_2018.columns)
 
     # Scamble and subset data frame into train + validation(80%) and test(10%)
     df = df.sample(frac=1).reset_index(drop=True)
@@ -125,6 +130,6 @@ def train():
 
 if __name__ == "__main__":
     # parser = argparse.ArgumentParser()
-    # train()
-    test()
+    train()
+    # test()
     # makefile(PATH, directory_2018, FILENAME)
