@@ -16,7 +16,7 @@ cd $path1
 zip -ur $current_path/lambda_function.zip pandas/ sklearn/
 
 cd $path2
-zip -ur $current_path/lambda_function.zip pyparsing.py six.py cycler.py pytz/ dateutil/
+zip -ur $current_path/lambda_function.zip pyparsing.py six.py cycler.py pytz/ dateutil/ xgboost/
 
 cd $current_path
 echo 'Complete packaging lambda function'
