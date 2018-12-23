@@ -7,64 +7,20 @@ Parameters: data frame, year
 Returns: truncated data frame
 '''
 
-def truncate(data_frame, year):
-    if year == 2017:
-        print("===== Start truncating features ======")
-        data_frame = data_frame.rename(index=str, columns={"IQS 1 avg": "brix", "IQS 2 avg": "granulation",
-                                        "IQS 3 avg": "seed_counts", "IQS 4 avg": "frost_damage"})
+def truncate(data_frame):
+    print("===== Start truncating features ======")
+    data_frame = data_frame.rename(index=str, columns={"IQS 1 avg": "brix", "IQS 2 avg": "granulation",
+                                    "IQS 3 avg": "seed_counts", "IQS 4 avg": "frost_damage"})
 
-        df_feature = data_frame[['2nd Color Variation (Dark Yellow +)', 'Elongation', 'Fruit', 'brix',
-                                'granulation', 'Orange', 'Calyx size', 'seed_counts', 'Overall Roundness',
-                                'Stem Size',  # Fill with mean
-
-                                'Creases', 'Dark Orange', 'frost_damage', 'Lemon (Dark Yellow +)',
-                                'Light Green', 'Orange/Yellow', 'Red', 'Red/Orange', 'Rough skin',
-                                'Ridges', 'Stem', 'Stem Area', 'Stem Rot',  # Fill with zero
-
-                                'Stem angle', 'Trapeziod Angle (Deg)',  # Fill with 180
-
-                                'DownWeight', 'Dark Yellow', 'Yellow','Light Yellow', 
-                                'Green', 'Dark Green', 'Scar', 'Roundness', 'Vertical Diameter Stability', 
-                                'Curvature', 'Cyclic Rod Number', 'Trip Rod', 'Flatness', 'Fruit Center X (mm)', 
-                                'Fruit Center Y (mm)', 'Grade', 'LR_Diff', 'Major Diameter (mm)', 'SizerSize', 
-                                'Smoothness', 'Start of Batch', 'Texture', 'UpWeight', 'VisionGrade', 'Volume', 
-                                'Weight', 'block_Num'  # No Filling
-                                ]]
-        df_feature= df_feature.fillna(df_feature.mean()[:])
-        # # Fill with mean
-        # df_feature = df_feature.fillna(df_feature.mean()['2nd Color Variation (Dark Yellow +)':'Stem Size'])
-
-        # # Fill with zero
-        # df_feature.loc[:, 'Creases': 'Stem Rot'] = df_feature.loc[:, 'Creases': 'Stem Rot'].fillna(0)
-
-        # # Fill with 180
-        # df_feature.loc[:, 'Stem angle': 'Trapeziod Angle (Deg)'] = df_feature.loc[:, 'Stem angle': 'Trapeziod Angle (Deg)'].fillna(180)
+    data_frame = data_frame.drop([
+        'EventTime', 'Cup', 'Lane', 'RodPulse', 'RodIndex', 'BatchId', 'QualityName'
+    ], axis=1)
+    data_frame = data_frame.fillna(data_frame.mean()[:])
     
-    elif year == 2018:
-        print("===== Start truncating features ======")
-        df_feature = data_frame[['2nd Color Variation (Dark Yellow +)', # Fill with mean
-
-                                'Lemon (Dark Yellow +)',
-                                'Light Green', 'Stem Area',  # Fill with zero
-
-                                'DownWeight', 'Dark Yellow', 'Yellow','Light Yellow', 
-                                'Green', 'Dark Green', 'Scar', 'Roundness', 'Vertical Diameter Stability', 
-                                'Curvature', 'Cyclic Rod Number', 'Trip Rod', 'Flatness', 'Fruit Center X (mm)', 
-                                'Fruit Center Y (mm)', 'Grade', 'LR_Diff', 'Major Diameter (mm)', 'SizerSize', 
-                                'Smoothness', 'Start of Batch', 'Texture', 'UpWeight', 'VisionGrade', 'Volume', 
-                                'Weight', 'block_Num'  # No Filling
-                                ]]
-        df_feature= df_feature.fillna(df_feature.mean()[:])
-        # # Fill with mean
-        # df_feature = df_feature.fillna(df_feature.mean()['2nd Color Variation (Dark Yellow +)'])
-
-        # # Fill with zero
-        # df_feature.loc[:, 'Lemon (Dark Yellow +)': 'Stem Area'] = df_feature.loc[:, 'Lemon (Dark Yellow +)': 'Stem Area'].fillna(0)
-
     # Convert Grade str to integer : A -> 1, B -> 2
-    df_feature.Grade = [ord(x) - 64 for x in df_feature.Grade]
+    data_frame.Grade = [ord(x) - 64 for x in data_frame.Grade]
 
-    return df_feature
+    return data_frame
 
 '''
 This function reduce the positive and negative correlated features
